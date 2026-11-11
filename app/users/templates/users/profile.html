@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <h2>Привіт, {{ username }}!</h2>
+
+    <form method="post" action="{{ url_for('users.logout') }}">
+        <button class="btn btn-outline-danger" type="submit">Вийти</button>
+    </form>
+</section>
+{% endblock %}
