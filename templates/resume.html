@@ -1,5 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>Тут буде моє резюме.</p>
+<nav aria-label="Розділи резюме" class="nav mb-3">
+    <a href="#about" class="nav-link">Про себе</a>
+    <a href="#education" class="nav-link">Освіта</a>
+    <a href="#skills" class="nav-link">Навички</a>
+    <a href="#technologies"	class="nav-link">Технології</a>
+    <a href="#projects" class="nav-link">Проєкти</a>
+</nav>
+
+<section id="about">
+    <h2>Про себе</h2>
+    <img src="{{ url_for('static', filename='images/profile.jpg') }}"
+         alt="Фото Олександра Громова" width="180">
+    <p>Мене звати Олександр Громов. Вивчаю розробку вебзастосунків
+        і працюю над навчальними проєктами.</p>
+</section>
+
+<section id="education">
+    <h2>Освіта</h2>
+    <p>Інженерія програмного забезпечення, група ІПЗ-31.</p>
+</section>
+
+<section id="skills">
+    <h2>Навички</h2>
+    <ul>
+        <li>Створення вебсторінок і форм</li>
+        <li>Розробка маршрутів для REST API</li>
+        <li>Робота з Git і GitHub</li>
+    </ul>
+</section>
+
+<section id="technologies">
+    <h2>Технології</h2>
+    <p>HTML, CSS, JavaScript, Node.js, PHP, SQLite, Python і Flask.</p>
+</section>
+
+<section id="projects">
+    <h2>Проєкти</h2>
+    <ul>
+        <li>API для дитячого садка на Node.js — кімнати й активності.</li>
+        <li>Сайт-резюме на Flask із шаблонами Jinja.</li>
+    </ul>
+</section>
 {% endblock %}

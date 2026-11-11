@@ -1,0 +1,42 @@
+body {
+    background-color: #f1f5f9;
+    color: #172033;
+}
+
+.site-header {
+    background-color: #172554;
+}
+
+.site-header .container,
+.page-content {
+    max-width: 900px;
+}
+
+.site-header .nav-link {
+    color: #fff;
+}
+
+.site-header .nav-link:hover,
+.site-header .nav-link:focus-visible {
+    text-decoration: underline;
+}
+
+.page-content section {
+    margin-bottom: 1rem;
+    padding: clamp(1rem, 4vw, 2rem);
+    background-color: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+}
+
+#about img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+}
+
+#contact-form {
+    max-width: 480px;
+}

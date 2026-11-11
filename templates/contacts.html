@@ -1,5 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>Тут будуть контакти та форма повідомлення.</p>
+<section>
+    <h2>Де мене знайти</h2>
+    <p><a href="https://github.com/sanyainside">Мій профіль на GitHub</a></p>
+</section>
+
+<section>
+    <h2>Написати повідомлення</h2>
+
+    <form id="contact-form" method="post">
+        <p>
+            <label for="name">Ім’я</label><br>
+            <input id="name" name="name" type="text" required class="form-control">
+        </p>
+
+        <p>
+            <label for="email">Електронна пошта</label><br>
+            <input id="email" name="email" type="email" required class="form-control">
+        </p>
+
+        <p>
+            <label for="message">Повідомлення</label><br>
+            <textarea id="message" name="message" rows="4" required class="form-control"></textarea>
+        </p>
+
+        <button type="submit" class="btn btn-primary">Надіслати</button>
+        <p id="form-status" role="status"></p>
+    </form>
+</section>
+
+<script>
+    const form = document.getElementById('contact-form');
+    const status = document.getElementById('form-status');
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        status.textContent = 'Це демонстраційна форма. Повідомлення не надіслано.';
+    });
+</script>
 {% endblock %}
