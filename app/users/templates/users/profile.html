@@ -8,4 +8,61 @@
         <button class="btn btn-outline-danger" type="submit">Вийти</button>
     </form>
 </section>
+<section>
+    <h2>Керування кукі</h2>
+
+    <form method="post" action="{{ url_for('users.manage_cookies') }}" class="mb-4">
+        <input type="hidden" name="action" value="add">
+
+        <label class="form-label" for="cookie-key">Ключ</label>
+        <input class="form-control mb-2" id="cookie-key" name="key"
+               pattern="[A-Za-z0-9_\-]{1,32}" maxlength="32" required>
+
+        <label class="form-label" for="cookie-value">Значення</label>
+        <input class="form-control mb-2" id="cookie-value" name="value"
+               maxlength="100" required>
+
+        <label class="form-label" for="cookie-age">Термін дії в секундах</label>
+        <input class="form-control mb-3" id="cookie-age" name="max_age"
+               type="number" min="1" max="2592000" value="3600" required>
+
+        <button class="btn btn-primary" type="submit">Зберегти кукі</button>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Ключ</th>
+                    <th scope="col">Значення</th>
+                    <th scope="col">Дія</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in cookies.items() %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td class="text-break">{{ value }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('users.manage_cookies') }}">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="key" value="{{ key }}">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">
+                                    Видалити
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3">Таблиця кукі порожня.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <form method="post" action="{{ url_for('users.manage_cookies') }}">
+        <input type="hidden" name="action" value="delete_all">
+        <button class="btn btn-outline-danger" type="submit">Видалити всі кукі</button>
+    </form>
+</section>
 {% endblock %}
