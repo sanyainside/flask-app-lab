@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="list-group mb-3" aria-label="Маршрути користувачів">
+    <a class="list-group-item list-group-item-action"
+       href="{{ url_for('users.greetings', name='John', age=30) }}">
+        Привітати John
+    </a>
+    <a class="list-group-item list-group-item-action"
+       href="{{ url_for('users.admin') }}">
+        Адміністратор
+    </a>
+</nav>
+
+<section>
+    <h2>Привіт, {{ name }}!</h2>
+    {% if age is not none %}
+        <p>Вік: {{ age }}</p>
+    {% else %}
+        <p>Вік не вказано.</p>
+    {% endif %}
+</section>
+{% endblock %}
