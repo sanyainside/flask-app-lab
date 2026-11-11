@@ -1,11 +1,25 @@
 {% extends "base.html" %}
 
+{% block html_theme %} data-bs-theme="{{ theme }}"{% endblock %}
+
 {% block content %}
 <section>
     <h2>Привіт, {{ username }}!</h2>
 
     <form method="post" action="{{ url_for('users.logout') }}">
         <button class="btn btn-outline-danger" type="submit">Вийти</button>
+    </form>
+
+    <form method="post" action="{{ url_for('users.set_theme') }}"
+        class="d-flex flex-wrap gap-2 mt-3" aria-label="Тема профілю">
+        <button class="btn {{ 'btn-primary' if theme == 'light' else 'btn-outline-primary' }}"
+                type="submit" name="theme" value="light">
+            Світла тема
+        </button>
+        <button class="btn {{ 'btn-primary' if theme == 'dark' else 'btn-outline-primary' }}"
+                type="submit" name="theme" value="dark">
+            Темна тема
+        </button>
     </form>
 </section>
 <section>

@@ -40,3 +40,13 @@ body {
 #contact-form {
     max-width: 480px;
 }
+
+html[data-bs-theme="dark"] body {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+html[data-bs-theme="dark"] .page-content section {
+    background-color: #1e293b;
+    border-color: #334155;
+}

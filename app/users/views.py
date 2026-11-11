@@ -6,6 +6,8 @@ from . import user_bp
 
 COOKIE_PREFIX = 'lab4_cookie_'
 
+THEME_COOKIE = 'lab4_profile_theme'
+
 @user_bp.route('/hi/<string:name>')
 def greetings(name):
     age = request.args.get('age', type=int)
@@ -52,11 +54,14 @@ def profile():
         if name.startswith(COOKIE_PREFIX)
     }
 
+    theme = 'dark' if request.cookies.get(THEME_COOKIE) == 'dark' else 'light'
+
     return render_template(
         'users/profile.html',
         title='Профіль',
         username=username,
         cookies=cookies,
+        theme=theme
     )
 
 
@@ -111,4 +116,23 @@ def manage_cookies():
     else:
         flash('Невідома дія.', 'danger')
 
+    return response
+
+@user_bp.route('/profile/theme', methods=['POST'])
+def set_theme():
+    if 'username' not in session:
+        flash('Спочатку увійдіть у систему.', 'danger')
+        return redirect(url_for('users.login'))
+
+    theme = request.form.get('theme')
+    response = redirect(url_for('users.profile'))
+
+    if theme not in ('light', 'dark'):
+        flash('Оберіть світлу або темну тему.', 'danger')
+        return response
+
+    response.set_cookie(
+        THEME_COOKIE, theme, max_age=30 * 24 * 60 * 60,
+        httponly=True, samesite='Lax',
+    )
     return response
