@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <h2>Опис товару</h2>
+    <p>{{ product.content }}</p>
+    <p><strong>Ціна:</strong> {{ product.price }} $</p>
+    <a class="btn btn-outline-primary" href="{{ url_for('products.product_list') }}">
+        Назад до списку
+    </a>
+</section>
+{% endblock %}
