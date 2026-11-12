@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+
+{% block content %}
+<section>
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        {% for error in form.csrf_token.errors %}
+            <p class="text-danger">{{ error }}</p>
+        {% endfor %}
+
+        {{ render_field(form.name) }}
+        {{ render_field(form.content) }}
+        {{ render_field(form.price) }}
+        {{ render_field(form.category, 'form-select') }}
+        {{ render_field(form.quantity) }}
+
+        {{ form.submit(class='btn btn-primary') }}
+        <a class="btn btn-outline-secondary" href="{{ url_for('products.product_list') }}">
+            До каталогу
+        </a>
+    </form>
+</section>
+{% endblock %}

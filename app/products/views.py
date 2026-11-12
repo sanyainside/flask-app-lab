@@ -1,4 +1,9 @@
-from flask import abort, render_template
+from datetime import datetime, timezone
+from decimal import Decimal
+
+from flask import abort, flash, redirect, render_template, request, url_for
+
+from .forms import ProductForm
 from tinydb import Query
 
 from . import product_bp
@@ -27,4 +32,67 @@ def product_detail(product_id):
         'products/detail_product.html',
         title=product['name'],
         product=product,
+    )
+
+def product_fields(form):
+    return {
+        'name': form.name.data,
+        'content': form.content.data.strip(),
+        'price': format(form.price.data, '.2f'),
+        'category': form.category.data,
+        'quantity': form.quantity.data,
+    }
+
+
+@product_bp.route('/product/add', methods=['GET', 'POST'])
+def product_add():
+    form = ProductForm()
+
+    if form.validate_on_submit():
+        product = product_fields(form)
+        with product_table() as table:
+            product_id = max((item['id'] for item in table.all()), default=0) + 1
+            product['id'] = product_id
+            product['created_at'] = datetime.now(timezone.utc).isoformat(timespec='seconds')
+            product['image'] = None
+            table.insert(product)
+
+        flash('Товар успішно додано.', 'success')
+        return redirect(url_for('products.product_detail', product_id=product_id), code=303)
+
+    if request.method == 'POST':
+        flash('Перевірте поля форми.', 'danger')
+
+    return render_template(
+        'products/product_form.html', title='Додати товар', form=form,
+    )
+
+@product_bp.route('/product/<int:product_id>/edit', methods=['GET', 'POST'])
+def product_edit(product_id):
+    query = Query().id == product_id
+
+    with product_table() as table:
+        product = table.get(query)
+
+    if product is None:
+        abort(404)
+
+    initial_data = {**product, 'price': Decimal(product['price'])}
+    form = ProductForm(data=initial_data)
+
+    if form.validate_on_submit():
+        with product_table() as table:
+            updated = table.update(product_fields(form), query)
+
+        if not updated:
+            abort(404)
+
+        flash('Зміни збережено.', 'success')
+        return redirect(url_for('products.product_detail', product_id=product_id), code=303)
+
+    if request.method == 'POST':
+        flash('Перевірте поля форми.', 'danger')
+
+    return render_template(
+        'products/product_form.html', title='Редагувати товар', form=form,
     )
