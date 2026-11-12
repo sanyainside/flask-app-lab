@@ -4,3 +4,4 @@ __pycache__/
 /.env
 /instance/
 /data/products.json
+/app/products/static/uploads/

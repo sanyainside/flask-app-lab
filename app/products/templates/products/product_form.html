@@ -3,7 +3,7 @@
 
 {% block content %}
 <section>
-    <form method="post" novalidate>
+    <form method="post" enctype="multipart/form-data" novalidate>
         {{ form.hidden_tag() }}
         {% for error in form.csrf_token.errors %}
             <p class="text-danger">{{ error }}</p>
@@ -14,6 +14,7 @@
         {{ render_field(form.price) }}
         {{ render_field(form.category, 'form-select') }}
         {{ render_field(form.quantity) }}
+        {{ render_field(form.image) }}
 
         {{ form.submit(class='btn btn-primary') }}
         <a class="btn btn-outline-secondary" href="{{ url_for('products.product_list') }}">

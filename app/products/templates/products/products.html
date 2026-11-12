@@ -4,9 +4,11 @@
 {% for product in products %}
     <section>
         <h2>{{ product.name }}</h2>
+        {% include "products/product_image.html" %}
         <p>Ціна: {{ product.price }} $</p>
         <p>Категорія: {{ product.category }}</p>
         <p>У наявності: {{ product.quantity }} шт.</p>
+        <p>Додано: {{ product.created_at }}</p>
         <a class="btn btn-primary"
            href="{{ url_for('products.product_detail', product_id=product.id) }}">
             Детальніше

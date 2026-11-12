@@ -9,6 +9,7 @@ from tinydb import Query
 from . import product_bp
 from .storage import product_table
 
+from .images import remove_product_image, store_product_image
 
 @product_bp.route('/products/')
 @product_bp.route('/product')
@@ -50,11 +51,11 @@ def product_add():
 
     if form.validate_on_submit():
         product = product_fields(form)
-        with product_table() as table:
+        with store_product_image(form.image.data) as image, product_table() as table:
             product_id = max((item['id'] for item in table.all()), default=0) + 1
             product['id'] = product_id
             product['created_at'] = datetime.now(timezone.utc).isoformat(timespec='seconds')
-            product['image'] = None
+            product['image'] = image
             table.insert(product)
 
         flash('Товар успішно додано.', 'success')
@@ -77,15 +78,23 @@ def product_edit(product_id):
     if product is None:
         abort(404)
 
-    initial_data = {**product, 'price': Decimal(product['price'])}
+    initial_data = {**product, 'price': Decimal(product['price']), 'image': None}
     form = ProductForm(data=initial_data)
 
     if form.validate_on_submit():
-        with product_table() as table:
-            updated = table.update(product_fields(form), query)
+        with store_product_image(form.image.data) as image, product_table() as table:
+            current_product = table.get(query)
+            if current_product is None:
+                abort(404)
 
-        if not updated:
-            abort(404)
+            changes = product_fields(form)
+            if image:
+                changes['image'] = image
+
+            table.update(changes, query)
+
+            if image:
+                remove_product_image(current_product.get('image'))
 
         flash('Зміни збережено.', 'success')
         return redirect(url_for('products.product_detail', product_id=product_id), code=303)
