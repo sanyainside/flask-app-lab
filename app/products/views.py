@@ -1,38 +1,25 @@
 from flask import abort, render_template
+from tinydb import Query
 
 from . import product_bp
+from .storage import product_table
 
 
-products = [
-    {
-        'id': 1,
-        'name': 'Laptop',
-        'price': 1200,
-        'content': 'Потужний ноутбук з Intel Core i7, 16 ГБ RAM і SSD на 512 ГБ.',
-    },
-    {
-        'id': 2,
-        'name': 'Phone',
-        'price': 800,
-        'content': 'Смартфон з OLED-дисплеєм 6,5 дюйма, подвійною камерою й акумулятором на 5000 мА·год.',
-    },
-    {
-        'id': 3,
-        'name': 'PC',
-        'price': 1800,
-        'content': 'Настільний комп’ютер з RTX 4070, 32 ГБ RAM і SSD на 1 ТБ.',
-    },
-]
-
-
-@product_bp.route('/')
+@product_bp.route('/products/')
+@product_bp.route('/product')
 def product_list():
+    with product_table() as table:
+        products = table.all()
+
     return render_template('products/products.html', title='Товари', products=products)
 
 
-@product_bp.route('/<int:product_id>')
+@product_bp.route('/products/<int:product_id>')
+@product_bp.route('/product/<int:product_id>')
 def product_detail(product_id):
-    product = next((item for item in products if item['id'] == product_id), None)
+    with product_table() as table:
+        product = table.get(Query().id == product_id)
+
     if product is None:
         abort(404)
 

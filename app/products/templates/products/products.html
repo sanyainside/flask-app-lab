@@ -5,6 +5,8 @@
     <section>
         <h2>{{ product.name }}</h2>
         <p>Ціна: {{ product.price }} $</p>
+        <p>Категорія: {{ product.category }}</p>
+        <p>У наявності: {{ product.quantity }} шт.</p>
         <a class="btn btn-primary"
            href="{{ url_for('products.product_detail', product_id=product.id) }}">
             Детальніше
