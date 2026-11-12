@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% from "_macros.html" import render_field %}
+
 {% block content %}
 <section>
     <h2>Де мене знайти</h2>
@@ -9,24 +11,18 @@
 <section>
     <h2>Написати повідомлення</h2>
 
-    <form id="contact-form" method="post">
-        <p>
-            <label for="name">Ім’я</label><br>
-            <input id="name" name="name" type="text" required class="form-control">
-        </p>
+    <form method="post" action="{{ url_for('contacts') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {% for error in form.csrf_token.errors %}
+            <p class="text-danger">{{ error }}</p>
+        {% endfor %}
 
-        <p>
-            <label for="email">Електронна пошта</label><br>
-            <input id="email" name="email" type="email" required class="form-control">
-        </p>
-
-        <p>
-            <label for="message">Повідомлення</label><br>
-            <textarea id="message" name="message" rows="4" required class="form-control"></textarea>
-        </p>
-
-        <button type="submit" class="btn btn-primary">Надіслати</button>
-        <p id="form-status" role="status"></p>
+        {{ render_field(form.name) }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.phone) }}
+        {{ render_field(form.subject, 'form-select') }}
+        {{ render_field(form.message) }}
+        {{ form.submit(class='btn btn-primary') }}
     </form>
 </section>
 
