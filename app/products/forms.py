@@ -80,3 +80,6 @@ class ProductForm(FlaskForm):
             raise ValidationError('Файл пошкоджений або має неправильний формат.') from error
         finally:
             upload.stream.seek(0)
+
+class DeleteProductForm(FlaskForm):
+    submit = SubmitField('Так, видалити товар')

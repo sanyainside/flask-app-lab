@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <p>Видалити товар <strong>{{ product.name }}</strong>?</p>
+
+    <form method="post"
+          action="{{ url_for('products.product_delete', product_id=product.id) }}">
+        {{ form.hidden_tag() }}
+        {{ form.submit(class='btn btn-danger') }}
+        <a class="btn btn-outline-secondary"
+           href="{{ url_for('products.product_detail', product_id=product.id) }}">
+            Скасувати
+        </a>
+    </form>
+</section>
+{% endblock %}

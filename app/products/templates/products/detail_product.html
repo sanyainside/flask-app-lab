@@ -8,9 +8,11 @@
     <p><strong>Ціна:</strong> {{ product.price }} $</p>
     <p>Категорія: {{ product.category }}</p>
     <p>У наявності: {{ product.quantity }} шт.</p>
-    <a class="btn btn-primary"
-        href="{{ url_for('products.product_edit', product_id=product.id) }}">
+    <a class="btn btn-primary" href="{{ url_for('products.product_edit', product_id=product.id) }}">
         Редагувати
+    </a>
+    <a class="btn btn-outline-danger" href="{{ url_for('products.confirm_product_delete', product_id=product.id) }}">
+        Видалити
     </a>
     <a class="btn btn-outline-primary" href="{{ url_for('products.product_list') }}">
         Назад до списку

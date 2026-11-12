@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from flask import abort, flash, redirect, render_template, request, url_for
 
-from .forms import ProductForm
+from .forms import DeleteProductForm, ProductForm
 from tinydb import Query
 
 from . import product_bp
@@ -105,3 +105,37 @@ def product_edit(product_id):
     return render_template(
         'products/product_form.html', title='Редагувати товар', form=form,
     )
+
+@product_bp.route('/product/<int:product_id>/confirm-delete')
+def confirm_product_delete(product_id):
+    with product_table() as table:
+        product = table.get(Query().id == product_id)
+
+    if product is None:
+        abort(404)
+
+    return render_template(
+        'products/confirm_delete.html',
+        title='Видалити товар',
+        product=product,
+        form=DeleteProductForm(),
+    )
+
+
+@product_bp.route('/product/<int:product_id>/delete', methods=['POST'])
+def product_delete(product_id):
+    form = DeleteProductForm()
+    if not form.validate_on_submit():
+        abort(400, description='Підтвердження недійсне. Відкрийте форму ще раз.')
+
+    query = Query().id == product_id
+    with product_table() as table:
+        product = table.get(query)
+        if product is None:
+            abort(404)
+
+        table.remove(query)
+
+    remove_product_image(product.get('image'))
+    flash(f'Товар «{product["name"]}» видалено.', 'success')
+    return redirect(url_for('products.product_list'), code=303)
