@@ -1,14 +1,32 @@
-from flask import Flask
+import os
+from pathlib import Path
 
-app = Flask(__name__)
-app.config.from_pyfile('../config.py')
+from flask import Flask, render_template
 
-from . import views
+from .config import CONFIGS
+from .extensions import db, migrate
 
-from .users import user_bp
 
-app.register_blueprint(user_bp)
+def create_app(config_name=None):
+    config_name = config_name or os.environ.get('APP_ENV', 'development')
 
-from .products import product_bp
+    app = Flask(__name__)
+    app.config.from_object(CONFIGS[config_name])
+    Path(app.instance_path).mkdir(parents=True, exist_ok=True)
 
-app.register_blueprint(product_bp)
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    from .views import main_bp
+    from .users import user_bp
+    from .products import product_bp
+
+    app.register_blueprint(main_bp)
+    app.register_blueprint(user_bp)
+    app.register_blueprint(product_bp)
+
+    @app.errorhandler(404)
+    def page_not_found(error):
+        return render_template('404.html', title='Сторінку не знайдено'), 404
+
+    return app

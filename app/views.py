@@ -1,19 +1,20 @@
 import json
 from pathlib import Path
 
-from flask import current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
-from . import app
+main_bp = Blueprint('main', __name__)
 
 from .forms import ContactForm
 
-@app.route('/')
+
+@main_bp.route('/')
 def resume():
     return render_template('resume.html', title='Резюме')
 
 
-@app.route('/contact', methods=['GET', 'POST'])
-@app.route('/contacts', methods=['GET', 'POST'])
+@main_bp.route('/contact', methods=['GET', 'POST'])
+@main_bp.route('/contacts', methods=['GET', 'POST'])
 def contacts():
     form = ContactForm()
 
@@ -37,7 +38,7 @@ def contacts():
             return render_template('contacts.html', title='Контакти', form=form), 500
 
         flash('Повідомлення успішно записано.', 'success')
-        return redirect(url_for('contacts'), code=303)
+        return redirect(url_for('main.contacts'), code=303)
 
     if request.method == 'POST':
         flash('Перевірте поля форми й спробуйте ще раз.', 'danger')
@@ -46,6 +47,9 @@ def contacts():
     return render_template('contacts.html', title='Контакти', form=form)
 
 
-@app.route('/homepage')
+@main_bp.route('/homepage')
 def home():
-    return render_template('homepage.html', title=app.config['SITE_NAME'])
+    return render_template(
+        'homepage.html',
+        title=current_app.config['SITE_NAME'],
+    )
