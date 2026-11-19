@@ -1,21 +1,46 @@
 {% extends "base.html" %}
 
+{% block css %}
+<link rel="stylesheet"
+      href="{{ url_for('posts.static', filename='css/posts.css') }}">
+{% endblock %}
+
 {% block content %}
-<a class="btn btn-primary mb-3" href="{{ url_for('posts.create_post') }}">
+<a class="btn btn-primary mb-4" href="{{ url_for('posts.create_post') }}">
     Додати пост
 </a>
 
-{% for post in posts %}
-    <section>
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.category }} · {{ post.posted.strftime('%d.%m.%Y %H:%M') }} UTC</p>
-        <p>{{ post.content[:100] }}{% if post.content|length > 100 %}…{% endif %}</p>
-        <a class="btn btn-outline-primary"
-           href="{{ url_for('posts.detail_post', post_id=post.id) }}">
-            Детальніше
-        </a>
-    </section>
-{% else %}
-    <p>Активних постів поки немає.</p>
-{% endfor %}
+<div class="row g-4">
+    {% for post in posts %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <article class="card post-card h-100">
+                <img class="card-img-top post-card-image"
+                     src="{{ url_for('posts.static', filename='img/default.jpg') }}"
+                     alt="">
+
+                <div class="card-body d-flex flex-column">
+                    <h2 class="card-title">{{ post.title }}</h2>
+
+                    <p class="post-meta">
+                        {{ post.category }}<br>
+                        {{ post.posted.strftime('%d.%m.%Y %H:%M') }} UTC
+                    </p>
+
+                    <p class="card-text">
+                        {{ post.content[:100] }}{% if post.content|length > 100 %}…{% endif %}
+                    </p>
+
+                    <a class="btn btn-outline-primary mt-auto"
+                       href="{{ url_for('posts.detail_post', post_id=post.id) }}">
+                        Детальніше
+                    </a>
+                </div>
+            </article>
+        </div>
+    {% else %}
+        <div class="col-12">
+            <p>Активних постів поки немає.</p>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}
