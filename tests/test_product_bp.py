@@ -6,7 +6,9 @@ from unittest.mock import patch
 
 from tinydb import Query
 
-from app import app
+from app import create_app
+
+app = create_app('testing')
 from app.products.storage import product_table
 
 
