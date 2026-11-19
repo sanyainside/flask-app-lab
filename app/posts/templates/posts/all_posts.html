@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a class="btn btn-primary mb-3" href="{{ url_for('posts.create_post') }}">
+    Додати пост
+</a>
+
+{% for post in posts %}
+    <section>
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.category }} · {{ post.posted.strftime('%d.%m.%Y %H:%M') }} UTC</p>
+        <p>{{ post.content[:100] }}{% if post.content|length > 100 %}…{% endif %}</p>
+        <a class="btn btn-outline-primary"
+           href="{{ url_for('posts.detail_post', post_id=post.id) }}">
+            Детальніше
+        </a>
+    </section>
+{% else %}
+    <p>Активних постів поки немає.</p>
+{% endfor %}
+{% endblock %}

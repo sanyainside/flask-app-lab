@@ -9,4 +9,4 @@ post_bp = Blueprint(
     static_folder='static',
 )
 
-from . import models
+from . import models, views

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <p>Автор: {{ post.author }}</p>
+    <p>Категорія: {{ post.category }}</p>
+    <p>Дата: {{ post.posted.strftime('%d.%m.%Y %H:%M') }} UTC</p>
+    <p>У списку: {{ 'так' if post.is_active else 'ні' }}</p>
+
+    <div style="white-space: pre-wrap">{{ post.content }}</div>
+
+    <div class="d-flex flex-wrap gap-2 mt-3">
+        <a class="btn btn-primary"
+        href="{{ url_for('posts.update_post', post_id=post.id) }}">
+            Редагувати
+        </a>
+        <a class="btn btn-outline-danger"
+        href="{{ url_for('posts.delete_post', post_id=post.id) }}">
+            Видалити
+        </a>
+    </div>
+
+    <a class="btn btn-outline-primary mt-3"
+       href="{{ url_for('posts.all_posts') }}">
+        До списку постів
+    </a>
+</section>
+{% endblock %}
