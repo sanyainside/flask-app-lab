@@ -2,7 +2,10 @@ from typing import List, Optional
 
 from sqlalchemy import Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Boolean, Float, ForeignKey, Integer, String, true
+from sqlalchemy import (
+    Boolean, DateTime, Float, ForeignKey, Integer, String, func, true,
+)
+from datetime import datetime
 
 from .. import db
 
@@ -43,6 +46,11 @@ class Product(db.Model):
     category: Mapped[Optional['Category']] = relationship(
         'Category',
         back_populates='products',
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
     )
 
     def __repr__(self):
