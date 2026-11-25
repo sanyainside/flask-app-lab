@@ -1,10 +1,10 @@
 from flask import current_app, flash, redirect, render_template
-from flask import request, session, url_for
+from flask import request, url_for
 from sqlalchemy.exc import SQLAlchemyError
 
 from . import post_bp
 from .forms import DeletePostForm, PostForm
-from .models import Post
+from .models import Post, Tag
 from ..extensions import db
 
 
@@ -47,8 +47,12 @@ def create_post():
             is_active=form.enabled.data,
             posted=form.publish_date.data,
             category=form.category.data,
-            author=session.get('username') or 'Anonymous',
+            user_id=form.user_id.data,
         )
+        post.tags = db.session.scalars(
+            db.select(Tag).where(Tag.id.in_(form.tags.data))
+        ).all()
+
         db.session.add(post)
 
         try:
@@ -76,11 +80,17 @@ def create_post():
 @post_bp.route('/<int:post_id>/update', methods=['GET', 'POST'])
 def update_post(post_id):
     post = db.get_or_404(Post, post_id)
-    form = PostForm(obj=post)
-
-    if request.method == 'GET':
-        form.enabled.data = post.is_active
-        form.publish_date.data = post.posted
+    form = PostForm(
+        data={
+            "title": post.title,
+            "content": post.content,
+            "enabled": post.is_active,
+            "publish_date": post.posted,
+            "category": post.category,
+            "user_id": post.user_id,
+            "tags": [tag.id for tag in post.tags],
+        }
+    )
 
     if form.validate_on_submit():
         post.title = form.title.data
@@ -88,6 +98,10 @@ def update_post(post_id):
         post.category = form.category.data
         post.is_active = form.enabled.data
         post.posted = form.publish_date.data
+        post.user_id = form.user_id.data
+        post.tags = db.session.scalars(
+            db.select(Tag).where(Tag.id.in_(form.tags.data))
+        ).all()
 
         try:
             db.session.commit()

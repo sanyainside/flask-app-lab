@@ -14,6 +14,12 @@
         {{ render_field(form.content) }}
         {{ render_field(form.publish_date) }}
         {{ render_field(form.category, 'form-select') }}
+        {{ render_field(form.user_id, 'form-select') }}
+        {{ render_field(form.tags, 'form-select') }}
+        <p class="form-text">
+            Для вибору кількох тегів утримуйте Command на macOS
+            або Ctrl на Windows.
+        </p>
 
         <div class="form-check mb-3">
             {{ form.enabled(class='form-check-input') }}
