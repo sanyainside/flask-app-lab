@@ -1,12 +1,38 @@
 import re
 
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import flash, redirect, render_template, request, session, url_for, abort
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+
+from flask_login import (
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
+from ..extensions import db
+from .forms import LoginForm, LogoutForm, RegistrationForm
+from .models import User
 
 from . import user_bp
 
 COOKIE_PREFIX = 'lab4_cookie_'
 
 THEME_COOKIE = 'lab4_profile_theme'
+
+@user_bp.app_context_processor
+def inject_logout_form():
+    return {"logout_form": LogoutForm()}
 
 @user_bp.route('/hi/<string:name>')
 def greetings(name):
@@ -24,30 +50,99 @@ def greetings(name):
 def admin():
     return redirect(url_for('users.greetings', name='administrator', age=45))
 
+@user_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('users.account'))
+
+    form = RegistrationForm()
+
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data,
+            email=form.email.data,
+        )
+        user.set_password(form.password.data)
+        db.session.add(user)
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash(
+                'Ім’я користувача або електронна пошта вже зайняті.',
+                'danger',
+            )
+            return render_template(
+                'users/register.html',
+                title='Реєстрація',
+                form=form,
+            ), 409
+        except SQLAlchemyError:
+            db.session.rollback()
+            current_app.logger.exception('Could not register user')
+            flash(
+                'Не вдалося створити обліковий запис. Спробуйте ще раз.',
+                'danger',
+            )
+            return render_template(
+                'users/register.html',
+                title='Реєстрація',
+                form=form,
+            ), 500
+
+        flash(
+            'Реєстрація успішна. Тепер увійдіть у свій обліковий запис.',
+            'success',
+        )
+        return redirect(url_for('users.login'), code=303)
+
+    return render_template(
+        'users/register.html',
+        title='Реєстрація',
+        form=form,
+    )
+
 @user_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'GET':
-        return render_template('users/login.html', title='Вхід')
+    if current_user.is_authenticated:
+        return redirect(url_for('users.account'))
 
-    username = request.form.get('username', '').strip()
-    password = request.form.get('password', '')
+    form = LoginForm()
 
-    if username == 'demo' and password == 'flask-demo-123':
-        session['username'] = username
-        flash('Ви успішно увійшли.', 'success')
-        return redirect(url_for('users.profile'))
+    if form.validate_on_submit():
+        user = db.session.scalar(
+            db.select(User).where(
+                User.username == form.username.data
+            )
+        )
 
-    flash('Невірний логін або пароль.', 'danger')
-    return redirect(url_for('users.login'))
+        if user is not None and user.check_password(form.password.data):
+            login_user(user, remember=form.remember.data)
+            session['username'] = user.username
 
+            flash('Ви успішно увійшли.', 'success')
+            return redirect(url_for('users.account'), code=303)
+
+        flash('Невірне ім’я користувача або пароль.', 'danger')
+
+    return render_template(
+        'users/login.html',
+        title='Вхід',
+        form=form,
+    )
+
+@user_bp.route('/account')
+@login_required
+def account():
+    return render_template(
+        'users/account.html',
+        title='Обліковий запис',
+    )
 
 @user_bp.route('/profile')
+@login_required
 def profile():
-    username = session.get('username')
-    if username is None:
-        flash('Спочатку увійдіть у систему.', 'danger')
-        return redirect(url_for('users.login'))
-
     cookies = {
         name[len(COOKIE_PREFIX):]: value
         for name, value in request.cookies.items()
@@ -59,23 +154,29 @@ def profile():
     return render_template(
         'users/profile.html',
         title='Профіль',
-        username=username,
+        username=current_user.username,
         cookies=cookies,
         theme=theme
     )
 
 
 @user_bp.route('/logout', methods=['POST'])
+@login_required
 def logout():
+    form = LogoutForm()
+
+    if not form.validate_on_submit():
+        abort(400, description='Недійсне підтвердження виходу.')
+
+    logout_user()
     session.pop('username', None)
+
     flash('Ви вийшли із системи.', 'info')
-    return redirect(url_for('users.login'))
+    return redirect(url_for('users.login'), code=303)
 
 @user_bp.route('/profile/cookies', methods=['POST'])
+@login_required
 def manage_cookies():
-    if 'username' not in session:
-        flash('Спочатку увійдіть у систему.', 'danger')
-        return redirect(url_for('users.login'))
 
     action = request.form.get('action')
     response = redirect(url_for('users.profile'))
@@ -119,10 +220,8 @@ def manage_cookies():
     return response
 
 @user_bp.route('/profile/theme', methods=['POST'])
+@login_required
 def set_theme():
-    if 'username' not in session:
-        flash('Спочатку увійдіть у систему.', 'danger')
-        return redirect(url_for('users.login'))
 
     theme = request.form.get('theme')
     response = redirect(url_for('users.profile'))
@@ -136,3 +235,17 @@ def set_theme():
         httponly=True, samesite='Lax',
     )
     return response
+
+@user_bp.route('/all')
+@login_required
+def user_list():
+    users = db.session.scalars(
+        db.select(User).order_by(User.id)
+    ).all()
+
+    return render_template(
+        'users/user_list.html',
+        title='Зареєстровані користувачі',
+        users=users,
+        total_users=len(users),
+    )

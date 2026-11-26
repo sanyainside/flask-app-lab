@@ -1,11 +1,55 @@
-<nav class="nav container py-2" aria-label="Головна навігація">
-    <a class="nav-link" href="{{ url_for('main.home') }}">Головна</a>
-    <a class="nav-link" href="{{ url_for('main.resume') }}">Резюме</a>
-    <a class="nav-link" href="{{ url_for('main.contacts') }}">Контакти</a>
+<nav class="nav container py-2 align-items-center"
+     aria-label="Головна навігація">
+
+    <a class="nav-link" href="{{ url_for('main.home') }}">
+        Головна
+    </a>
+
+    <a class="nav-link" href="{{ url_for('main.resume') }}">
+        Резюме
+    </a>
+
+    <a class="nav-link" href="{{ url_for('main.contacts') }}">
+        Контакти
+    </a>
+
     <a class="nav-link"
-       href="{{ url_for('users.greetings', name='John') }}">Привітання</a>
-    <a class="nav-link" href="{{ url_for('products.product_list') }}">Товари</a>
-    <a class="nav-link" href="{{ url_for('users.profile') }}">Профіль</a>
-    <a class="nav-link" href="{{ url_for('users.login') }}">Вхід</a>
-    <a class="nav-link" href="{{ url_for('posts.all_posts') }}">Пости</a>
+       href="{{ url_for('users.greetings', name='John') }}">
+        Привітання
+    </a>
+
+    <a class="nav-link"
+       href="{{ url_for('products.product_list') }}">
+        Товари
+    </a>
+
+    <a class="nav-link" href="{{ url_for('posts.all_posts') }}">
+        Пости
+    </a>
+
+    {% if current_user.is_authenticated %}
+        <a class="nav-link" href="{{ url_for('users.account') }}">
+            Профіль
+        </a>
+
+        <a class="nav-link" href="{{ url_for('users.user_list') }}">
+            Користувачі
+        </a>
+
+        <form method="post" action="{{ url_for('users.logout') }}">
+            {{ logout_form.hidden_tag() }}
+
+            <button class="nav-link btn btn-link" type="submit">
+                Вихід
+            </button>
+        </form>
+    {% else %}
+        <a class="nav-link" href="{{ url_for('users.register') }}">
+            Реєстрація
+        </a>
+
+        <a class="nav-link" href="{{ url_for('users.login') }}">
+            Вхід
+        </a>
+    {% endif %}
 </nav>

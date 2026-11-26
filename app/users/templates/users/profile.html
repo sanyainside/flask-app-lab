@@ -7,7 +7,10 @@
     <h2>Привіт, {{ username }}!</h2>
 
     <form method="post" action="{{ url_for('users.logout') }}">
-        <button class="btn btn-outline-danger" type="submit">Вийти</button>
+        {{ logout_form.hidden_tag() }}
+        <button class="btn btn-outline-danger" type="submit">
+            Вийти
+        </button>
     </form>
 
     <form method="post" action="{{ url_for('users.set_theme') }}"

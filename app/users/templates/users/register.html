@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import render_field %}
+
+{% block content %}
+<section>
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+        {% for error in form.csrf_token.errors %}
+            <p class="text-danger">{{ error }}</p>
+        {% endfor %}
+
+        {{ render_field(form.username) }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.password) }}
+        {{ render_field(form.confirm_password) }}
+
+        {{ form.submit(class="btn btn-primary") }}
+
+        <a
+            class="btn btn-outline-secondary"
+            href="{{ url_for('users.login') }}"
+        >
+            До входу
+        </a>
+    </form>
+</section>
+{% endblock %}

@@ -1,21 +1,29 @@
 {% extends "base.html" %}
+{% from "_macros.html" import render_field %}
 
 {% block content %}
 <section>
-    <form method="post" action="{{ url_for('users.login') }}">
-        <div class="mb-3">
-            <label class="form-label" for="username">Логін</label>
-            <input class="form-control" id="username" name="username"
-                   autocomplete="username" required>
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+        {% for error in form.csrf_token.errors %}
+            <p class="text-danger">{{ error }}</p>
+        {% endfor %}
+
+        {{ render_field(form.username) }}
+        {{ render_field(form.password) }}
+
+        <div class="form-check mb-3">
+            {{ form.remember(class="form-check-input") }}
+            {{ form.remember.label(class="form-check-label") }}
         </div>
 
-        <div class="mb-3">
-            <label class="form-label" for="password">Пароль</label>
-            <input class="form-control" id="password" name="password" type="password"
-                   autocomplete="current-password" required>
-        </div>
+        {{ form.submit(class="btn btn-primary") }}
 
-        <button class="btn btn-primary" type="submit">Увійти</button>
+        <a class="btn btn-outline-secondary"
+           href="{{ url_for('users.register') }}">
+            Реєстрація
+        </a>
     </form>
 </section>
 {% endblock %}

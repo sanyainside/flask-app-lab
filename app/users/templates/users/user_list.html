@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section>
+    <p>
+        Загальна кількість користувачів:
+        <strong>{{ total_users }}</strong>
+    </p>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Ім’я користувача</th>
+                    <th scope="col">Електронна пошта</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3">
+                            Зареєстрованих користувачів немає.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
